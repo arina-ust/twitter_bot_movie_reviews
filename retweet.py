@@ -29,10 +29,11 @@ def authorize_api():
 def retweet(api):
     """Retweet tweets that contain keywords from the latest 20 tweets of the
     home timeline."""
-    for tweet in tweepy.Cursor(api.home_timeline, count=20).items(20):
+    for tweet in tweepy.Cursor(api.home_timeline, count=20, include_entities=True,
+                               tweet_mode='extended').items(20):
         try:
             for keyword in keywords:
-                if keyword in tweet.text:
+                if (keyword in tweet.full_text) and (not has_duplicate_url(api, tweet)):
                     try:
                         tweet.retweet()
                         sleep(5)
@@ -40,5 +41,14 @@ def retweet(api):
                         print(exception)
         except StopIteration:
             break
+
+def has_duplicate_url(api, tweet):
+    """Check if this tweet has the same url as recently retweeted ones."""
+    url_to_check = tweet.entities['urls'][0]['url']
+    for my_tweet in tweepy.Cursor(api.user_timeline, count=20, include_rts=True,
+                                  tweet_mode='extended').items(35):
+        if url_to_check == my_tweet.retweeted_status.entities['urls'][0]['url']:
+            return True
+    return False
 
 retweet(authorize_api())
