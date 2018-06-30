@@ -1,4 +1,4 @@
-# Twitter bot that retweets tweets containing specfied keywords
+# Twitter bot that retweets tweets containing keywords
 
 This twitter bot retweets recent tweets from its timeline. 
 
