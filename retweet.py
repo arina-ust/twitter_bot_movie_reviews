@@ -30,7 +30,7 @@ def retweet(api):
     """Retweet tweets that contain keywords from the latest 20 tweets of the
     home timeline."""
     for tweet in tweepy.Cursor(api.home_timeline, count=20, include_entities=True,
-                               tweet_mode='extended').items(20):
+                               tweet_mode='extended').items(25):
         try:
             for keyword in keywords:
                 if (keyword in tweet.full_text) and (not has_duplicate_url(api, tweet)):
@@ -51,4 +51,9 @@ def has_duplicate_url(api, tweet):
             return True
     return False
 
-retweet(authorize_api())
+def handler(event, context):
+    """Handler function for AWS lambda"""
+    retweet(authorize_api())
+
+# for local runs
+#handler(None, None)
