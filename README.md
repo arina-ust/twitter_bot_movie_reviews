@@ -2,7 +2,7 @@
 
 This twitter bot retweets recent tweets from its timeline. 
 
-The retweet is based on the keywords that are specified in the variable `keywords` that, in turn, is stored in the file `keywords.py`. The variable `keywords` is a list of strings.
+The retweet is based on the keywords that are specified in the variable `keywords` that, in turn, is stored in the file `keywords.py`. The variable `keywords` is a list of strings.  
 The bot does not retweet a new tweet if this tweet contains the same URL as its recent retweets.
 
 Twitter's tokens (consumer key, consumer secret, access token, access token secret) are stored in the `credentials.py`.
