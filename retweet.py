@@ -14,8 +14,10 @@ https://www.digitalocean.com/community/tutorials/how-to-create-a-twitterbot-with
 from time import sleep
 
 import tweepy
+from newspaper import Article
+
 from credentials import consumer_key, consumer_secret, access_token, access_token_secret
-from keywords import keywords
+from keywords import main_keywords, tweet_keywords, author
 
 
 def authorize_api():
@@ -29,31 +31,57 @@ def authorize_api():
 def retweet(api):
     """Retweet tweets that contain keywords from the latest 25 tweets of the
     home timeline."""
-    for tweet in tweepy.Cursor(api.home_timeline, count=25, include_entities=True,
-                               tweet_mode='extended').items(25):
+    for tweet in tweepy.Cursor(api.home_timeline, count=70, include_entities=True,
+                               tweet_mode='extended').items(70):
         try:
-            for keyword in keywords:
-                if (keyword in tweet.full_text) and (not has_duplicate_url(api, tweet)):
-                    try:
-                        tweet.retweet()
-                        sleep(5)
-                    except tweepy.TweepError as exception:
-                        print(exception)
+            for keyword in main_keywords:
+                if valid_tweet(api, tweet, keyword):
+                    post_retweet(tweet)
+                    return
+            for keyword in tweet_keywords:
+                if valid_tweet(api, tweet, keyword):
+                    article = Article(get_url(tweet), language='ru')
+                    article.download()
+                    article.parse()
+                    if (author in article.authors):
+                        post_retweet(tweet)
+                        return
         except StopIteration:
             break
 
+
+def valid_tweet(api, tweet, keyword):
+    """Check if the tweet contains the keyword and that this tweet
+    has not been previously retweeted."""
+    return (keyword in tweet.full_text) and (not has_duplicate_url(api, tweet))
+
 def has_duplicate_url(api, tweet):
     """Check if this tweet has the same url as recently retweeted ones."""
-    url_to_check = tweet.entities['urls'][0]['url']
-    for my_tweet in tweepy.Cursor(api.user_timeline, count=50, include_rts=True,
-                                  tweet_mode='extended').items(50):
+    url_to_check = get_url(tweet)
+    for my_tweet in tweepy.Cursor(api.user_timeline, count=30, include_rts=True,
+                                  tweet_mode='extended').items(30):
         if url_to_check == my_tweet.retweeted_status.entities['urls'][0]['url']:
             return True
     return False
+
+
+def get_url(tweet):
+    """Extract url from the tweet."""
+    return tweet.entities['urls'][0]['url']
+
+
+def post_retweet(tweet):
+    """Retweet this tweet."""
+    try:
+        tweet.retweet()
+        sleep(5)
+    except tweepy.TweepError as exception:
+        print(exception)
+
 
 def handler(event, context):
     """Handler function for AWS lambda"""
     retweet(authorize_api())
 
 # for local runs
-#handler(None, None)
+handler(None, None)
