@@ -9,9 +9,11 @@ The bot does not retweet a new tweet if this tweet contains the same URL as its 
 
 Twitter's tokens (consumer key, consumer secret, access token, access token secret) are stored in the `credentials.py`.
 
-The bot is built for running on AWS Lambda, but can be run locally as well.  
+The bot is built for running on AWS Lambda, but can be run locally as well<sup>**</sup>.  
 
-<sup>*</sup>As I parse Russian webpages, `author` is not the same as a keyword in `main_keywords`, because I have to take care of changing endings.
+
+<sup>*</sup>As I parse Russian webpages, `author` is not the same as a keyword in `main_keywords`, because I have to take care of changing endings.  
+<sup>**</sup>After update on 22/09/2018 I cannot run this code on AWS Lambda due to the usage of newspaper library. Although I found this [useful template](https://github.com/will3216/newspaper3k_lambda_template) for dealing with this problem, I didn't bother to follow it and update my lambda function (maybe later).
 
 ------------------------------------------
 __Useful links__  
