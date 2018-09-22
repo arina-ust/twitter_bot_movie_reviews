@@ -17,7 +17,7 @@ import tweepy
 from newspaper import Article
 
 from credentials import consumer_key, consumer_secret, access_token, access_token_secret
-from keywords import main_keywords, tweet_keywords, author
+from keywords import main_keywords, tweet_keywords, author, lang
 
 
 def authorize_api():
@@ -40,7 +40,7 @@ def retweet(api):
                     return
             for keyword in tweet_keywords:
                 if valid_tweet(api, tweet, keyword):
-                    article = Article(get_url(tweet), language='ru')
+                    article = Article(get_url(tweet), language=lang)
                     article.download()
                     article.parse()
                     if (author in article.authors):
